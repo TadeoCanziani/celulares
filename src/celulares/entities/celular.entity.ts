@@ -6,4 +6,5 @@ export class Celular {
   espacioAlmacenamiento: string;
   nucleos: number;
   anio?: number;
+  marcaId: number;
 }

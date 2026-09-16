@@ -1,3 +1,3 @@
 export class CreateMarcaDto {
-    nombre: string;
+  nombre: string;
 }

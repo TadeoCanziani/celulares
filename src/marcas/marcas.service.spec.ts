@@ -15,4 +15,13 @@ describe('MarcasService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+
+  it('should create a marca from dto', () => {
+    const result = service.create({ nombre: 'Motorola' });
+
+    expect(result).toMatchObject({
+      nombre: 'Motorola',
+    });
+    expect(result.id).toBeDefined();
+  });
 });
