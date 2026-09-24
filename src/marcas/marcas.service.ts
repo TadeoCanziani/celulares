@@ -3,79 +3,62 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ILike, Repository } from 'typeorm';
 import { CreateMarcaDto } from './dto/create-marca.dto';
 import { UpdateMarcaDto } from './dto/update-marca.dto';
 import { Marca } from './entities/marca.entity';
 
 @Injectable()
 export class MarcasService {
-  private readonly marcas: Marca[] = [
-    { id: 1, nombre: 'Samsung' },
-    { id: 2, nombre: 'Apple' },
-    { id: 3, nombre: 'Xiaomi' },
-  ];
+  constructor(
+    @InjectRepository(Marca)
+    private readonly marcasRepository: Repository<Marca>,
+  ) {}
 
-  private nextId = 4;
-
-  create(createMarcaDto: CreateMarcaDto): Marca {
-    const marcaExiste = this.marcas.some(
-      (marca) =>
-        marca.nombre.toLowerCase() === createMarcaDto.nombre.toLowerCase(),
-    );
+  async create(createMarcaDto: CreateMarcaDto): Promise<Marca> {
+    const marcaExiste = await this.marcasRepository.findOneBy({
+      nombre: createMarcaDto.nombre,
+    });
 
     if (marcaExiste) {
       throw new ConflictException('La marca ya existe');
     }
 
-    const marca: Marca = {
-      id: this.nextId++,
-      nombre: createMarcaDto.nombre,
-    };
-
-    this.marcas.push(marca);
-    return marca;
+    return this.marcasRepository.save(createMarcaDto);
   }
 
-  findAll(nombre?: string): Marca[] {
-    if (!nombre) return this.marcas;
+  async findAll(nombre?: string): Promise<Marca[]> {
+    if (!nombre) {
+      return this.marcasRepository.find();
+    }
 
-    const texto = nombre.toLowerCase();
-    return this.marcas.filter((marca) =>
-      marca.nombre.toLowerCase().includes(texto),
-    );
+    return this.marcasRepository.find({
+      where: { nombre: ILike(`%${nombre}%`) },
+    });
   }
 
-  findOne(id: number): Marca {
-    const marca = this.marcas.find((marca) => marca.id === id);
+  async findOne(id: number): Promise<Marca> {
+    const marca = await this.marcasRepository.findOneBy({ id });
+
     if (!marca) {
       throw new NotFoundException(`La marca con id ${id} no existe`);
     }
+
     return marca;
   }
 
-  update(id: number, updateMarcaDto: UpdateMarcaDto): Marca {
-    const marca = this.findOne(id);
-
-    const marcaActualizada: Marca = {
-      ...marca,
-      ...updateMarcaDto,
-    };
-
-    const index = this.marcas.findIndex((item) => item.id === id);
-    if (index !== -1) {
-      this.marcas[index] = marcaActualizada;
-    }
-
-    return marcaActualizada;
+  async update(id: number, updateMarcaDto: UpdateMarcaDto): Promise<Marca> {
+    await this.findOne(id);
+    await this.marcasRepository.update(id, updateMarcaDto);
+    return this.findOne(id);
   }
 
-  remove(id: number): string {
-    const index = this.marcas.findIndex((m) => m.id === id);
-    if (index === -1) {
-      throw new NotFoundException('La marca no existe');
-    }
+  async remove(id: number): Promise<void> {
+    const resultado = await this.marcasRepository.delete(id);
 
-    const marcaEliminada = this.marcas.splice(index, 1)[0];
-    return `La marca ${marcaEliminada.nombre} con id ${marcaEliminada.id} fue eliminada exitosamente`;
+    if (!resultado.affected) {
+      throw new NotFoundException(`La marca con id ${id} no existe`);
+    }
   }
 }

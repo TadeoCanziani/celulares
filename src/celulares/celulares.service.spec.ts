@@ -23,7 +23,6 @@ describe('CelularesService', () => {
       memoriaRam: '6GB',
       espacioAlmacenamiento: '128GB',
       nucleos: 8,
-      anio: 2020,
       marcaId: 2,
     });
 

@@ -3,7 +3,7 @@
       image: 'postgres:latest'
       restart: always
       volumes:
-        - './postgres_data:/var/lib/postgresql'
+        - './postgres_data:/var/lib/postgresql/data'
       environment:
         - POSTGRES_USER=tadeo
         - POSTGRES_DB=celulares
