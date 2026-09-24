@@ -7,10 +7,12 @@ import {
   Param,
   Delete,
   Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { CelularesService } from './celulares.service';
 import { CreateCelularDto } from './dto/create-celular.dto';
 import { UpdateCelularDto } from './dto/update-celular.dto';
+import { QueryCelularDto } from './dto/query-celular.dto';
 
 @Controller('celulares')
 export class CelularesController {
@@ -22,22 +24,25 @@ export class CelularesController {
   }
 
   @Get()
-  findAll(@Query('nombre') nombre?: string) {
-    return this.celularesService.findAll(nombre);
+  findAll(@Query() query: QueryCelularDto) {
+    return this.celularesService.findAll(query);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.celularesService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.celularesService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCelularDto: UpdateCelularDto) {
-    return this.celularesService.update(+id, updateCelularDto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateCelularDto: UpdateCelularDto,
+  ) {
+    return this.celularesService.update(id, updateCelularDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.celularesService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.celularesService.remove(id);
   }
 }

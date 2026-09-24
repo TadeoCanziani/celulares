@@ -5,6 +5,5 @@ export class Celular {
   memoriaRam: string;
   espacioAlmacenamiento: string;
   nucleos: number;
-  anio?: number;
   marcaId: number;
 }

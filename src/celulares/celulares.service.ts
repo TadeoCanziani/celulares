@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCelularDto } from './dto/create-celular.dto';
 import { UpdateCelularDto } from './dto/update-celular.dto';
 import { Celular } from './entities/celular.entity';
+import { QueryCelularDto } from './dto/query-celular.dto';
 
 @Injectable()
 export class CelularesService {
@@ -56,22 +57,55 @@ export class CelularesService {
     return nuevoCelular;
   }
 
-  findAll(nombre?: string): Celular[] {
-    if (!nombre) return this.celulares;
+  findAll(query: QueryCelularDto): Celular[] {
+    // 1) Filtro por nombre (si viene), case-insensitive
+    let resultado = this.celulares;
 
-    const texto = nombre.toLowerCase();
-    return this.celulares.filter((celular) =>
-      celular.nombre.toLowerCase().includes(texto),
-    );
+    if (query.nombre) {
+      const texto = query.nombre.toLowerCase();
+      resultado = resultado.filter((celular) =>
+        celular.nombre.toLowerCase().includes(texto),
+      );
+    }
+
+    // 2) Ordenamiento: comparador por el campo sortBy,
+    //    e invertimos el signo para orden descendente
+    const sortBy = (query.sortBy ?? 'nombre') as keyof Celular;
+    const orderBy = query.orderBy ?? 'asc';
+
+    resultado = [...resultado].sort((a, b) => {
+      const valorA = a[sortBy];
+      const valorB = b[sortBy];
+
+      if (valorA === valorB) return 0;
+      if (valorA === undefined) return 1;
+      if (valorB === undefined) return -1;
+
+      if (valorA < valorB) {
+        return orderBy === 'asc' ? -1 : 1;
+      }
+
+      return orderBy === 'asc' ? 1 : -1;
+    });
+
+    // 3) Paginación: offset = (page - 1) * limit, default limit 10
+    const page = query.page || 1;
+    const limit = query.limit || 10;
+    const offset = (page - 1) * limit;
+
+    return resultado.slice(offset, offset + limit);
   }
 
-  findOne(id: number): Celular | undefined {
-    return this.celulares.find((celular) => celular.id === id);
+  findOne(id: number): Celular {
+    const celular = this.celulares.find((celular) => celular.id === id);
+    if (!celular) {
+      throw new NotFoundException(`El celular con id ${id} no existe`);
+    }
+    return celular;
   }
 
-  update(id: number, updateCelularDto: UpdateCelularDto): Celular | undefined {
+  update(id: number, updateCelularDto: UpdateCelularDto): Celular {
     const celular = this.findOne(id);
-    if (!celular) return undefined;
 
     const celularActualizado: Celular = {
       ...celular,
@@ -86,9 +120,11 @@ export class CelularesService {
     return celularActualizado;
   }
 
-  remove(id: number): Celular | null {
+  remove(id: number): Celular {
     const index = this.celulares.findIndex((c) => c.id === id);
-    if (index === -1) return null;
+    if (index === -1) {
+      throw new NotFoundException(`El celular con id ${id} no existe`);
+    }
 
     return this.celulares.splice(index, 1)[0];
   }

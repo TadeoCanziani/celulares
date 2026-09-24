@@ -24,4 +24,20 @@ describe('MarcasService', () => {
     });
     expect(result.id).toBeDefined();
   });
+
+  it('should reject a marca that already exists', () => {
+    expect(() => service.create({ nombre: 'apple' })).toThrow(
+      'La marca ya existe',
+    );
+  });
+
+  it('should reject removing a marca that does not exist', () => {
+    expect(() => service.remove(999)).toThrow('La marca no existe');
+  });
+
+  it('should return a success message when removing a marca', () => {
+    expect(service.remove(1)).toBe(
+      'La marca Samsung con id 1 fue eliminada exitosamente',
+    );
+  });
 });

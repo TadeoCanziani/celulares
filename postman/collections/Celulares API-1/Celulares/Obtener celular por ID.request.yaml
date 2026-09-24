@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/celulares/:id"
+method: GET
+pathVariables:
+  id: ""
+order: 4483205337485784

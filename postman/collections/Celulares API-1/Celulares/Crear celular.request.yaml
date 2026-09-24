@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/celulares"
+method: POST
+order: 3763060001163843

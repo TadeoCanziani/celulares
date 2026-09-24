@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/marcas"
+method: GET
+order: 4039396533112286

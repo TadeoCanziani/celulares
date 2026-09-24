@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateMarcaDto } from './dto/create-marca.dto';
 import { UpdateMarcaDto } from './dto/update-marca.dto';
 import { Marca } from './entities/marca.entity';
@@ -14,6 +18,15 @@ export class MarcasService {
   private nextId = 4;
 
   create(createMarcaDto: CreateMarcaDto): Marca {
+    const marcaExiste = this.marcas.some(
+      (marca) =>
+        marca.nombre.toLowerCase() === createMarcaDto.nombre.toLowerCase(),
+    );
+
+    if (marcaExiste) {
+      throw new ConflictException('La marca ya existe');
+    }
+
     const marca: Marca = {
       id: this.nextId++,
       nombre: createMarcaDto.nombre,
@@ -32,13 +45,16 @@ export class MarcasService {
     );
   }
 
-  findOne(id: number): Marca | undefined {
-    return this.marcas.find((marca) => marca.id === id);
+  findOne(id: number): Marca {
+    const marca = this.marcas.find((marca) => marca.id === id);
+    if (!marca) {
+      throw new NotFoundException(`La marca con id ${id} no existe`);
+    }
+    return marca;
   }
 
-  update(id: number, updateMarcaDto: UpdateMarcaDto): Marca | undefined {
+  update(id: number, updateMarcaDto: UpdateMarcaDto): Marca {
     const marca = this.findOne(id);
-    if (!marca) return undefined;
 
     const marcaActualizada: Marca = {
       ...marca,
@@ -53,10 +69,13 @@ export class MarcasService {
     return marcaActualizada;
   }
 
-  remove(id: number): Marca | null {
+  remove(id: number): string {
     const index = this.marcas.findIndex((m) => m.id === id);
-    if (index === -1) return null;
+    if (index === -1) {
+      throw new NotFoundException('La marca no existe');
+    }
 
-    return this.marcas.splice(index, 1)[0];
+    const marcaEliminada = this.marcas.splice(index, 1)[0];
+    return `La marca ${marcaEliminada.nombre} con id ${marcaEliminada.id} fue eliminada exitosamente`;
   }
 }

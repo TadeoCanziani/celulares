@@ -1,9 +1,17 @@
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+
 export class CreateCelularDto {
-  nombre: string;
-  tamano: string;
-  memoriaRam: string;
-  espacioAlmacenamiento: string;
-  nucleos: number;
-  anio?: number;
-  marcaId: number;
+  @IsString()
+  @IsNotEmpty()
+  nombre!: string;
+  @IsString()
+  tamano!: string;
+  @IsString()
+  memoriaRam!: string;
+  @IsString()
+  espacioAlmacenamiento!: string;
+  @IsNumber()
+  nucleos!: number;
+  @IsNumber()
+  marcaId!: number;
 }
