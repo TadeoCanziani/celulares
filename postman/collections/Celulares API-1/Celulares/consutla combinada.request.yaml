@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/celulares?memoriaRam=8GB&sortBy=nombre"
+method: GET
+queryParams:
+  - key: memoriaRam
+    value: 8GB
+    disabled: false
+    description: ""
+  - key: sortBy
+    value: nombre
+    disabled: false
+    description: ""
+order: 4485718705618079

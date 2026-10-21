@@ -1,2 +1,4 @@
 $kind: collection
 name: Celulares API
+variables:
+  baseUrl: ""

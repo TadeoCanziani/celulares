@@ -8,17 +8,20 @@ import { ILike, Repository } from 'typeorm';
 import { CreateMarcaDto } from './dto/create-marca.dto';
 import { UpdateMarcaDto } from './dto/update-marca.dto';
 import { Marca } from './entities/marca.entity';
+import { Celular } from '../celulares/entities/celular.entity';
 
 @Injectable()
 export class MarcasService {
   constructor(
     @InjectRepository(Marca)
     private readonly marcasRepository: Repository<Marca>,
+    @InjectRepository(Celular)
+    private readonly celularRepository: Repository<Celular>,
   ) {}
 
   async create(createMarcaDto: CreateMarcaDto): Promise<Marca> {
     const marcaExiste = await this.marcasRepository.findOneBy({
-      nombre: createMarcaDto.nombre,
+      nombre: ILike(createMarcaDto.nombre),
     });
 
     if (marcaExiste) {
@@ -55,10 +58,21 @@ export class MarcasService {
   }
 
   async remove(id: number): Promise<void> {
-    const resultado = await this.marcasRepository.delete(id);
+    // 1. ¿La marca existe?
+    await this.findOne(id);
 
-    if (!resultado.affected) {
-      throw new NotFoundException(`La marca con id ${id} no existe`);
+    // 2. ¿Tiene celulares asociados?
+    const celulares = await this.celularRepository.find({
+      where: { marcaId: id },
+    });
+
+    if (celulares.length > 0) {
+      throw new ConflictException(
+        'No se puede eliminar la marca porque tiene celulares asociados',
+      );
     }
+
+    // 3. Recién ahí borro
+    await this.marcasRepository.delete(id);
   }
 }
