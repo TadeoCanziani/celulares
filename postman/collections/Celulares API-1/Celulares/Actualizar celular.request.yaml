@@ -2,5 +2,22 @@ $kind: http-request
 url: "{{baseUrl}}/celulares/:id"
 method: PATCH
 pathVariables:
-  id: ""
+  id: "6"
+body:
+  type: json
+  content: "{\r
+
+    \  \"nombre\": \"poco c75\",\r
+
+    \  \"tamano\": \"6.88\",\r
+
+    \  \"memoriaRam\": \"8GB\",\r
+
+    \  \"espacioAlmacenamiento\": \"256GB\",\r
+
+    \  \"nucleos\": 8,\r
+
+    \  \"marcaId\": 3\r
+
+    }"
 order: 4449042120395391

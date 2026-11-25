@@ -1,0 +1,7 @@
+$kind: http-request
+name: consultar marca inexistente
+url: "{{baseUrl}}/marcas/:id"
+method: GET
+pathVariables:
+  id: "256"
+order: 1098

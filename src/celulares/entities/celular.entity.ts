@@ -27,6 +27,9 @@ export class Celular {
   @Column()
   nucleos!: number;
 
+  @Column({ nullable: true })
+  imagen?: string;
+
   @Column()
   marcaId!: number;
 
@@ -34,4 +37,3 @@ export class Celular {
   @JoinColumn({ name: 'marcaId' })
   marca?: Marca;
 }
-

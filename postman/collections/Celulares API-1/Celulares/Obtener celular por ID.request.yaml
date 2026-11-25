@@ -2,5 +2,7 @@ $kind: http-request
 url: "{{baseUrl}}/celulares/:id"
 method: GET
 pathVariables:
-  id: ""
+  - key: id
+    value: "2"
+    description: ""
 order: 4483205337485784

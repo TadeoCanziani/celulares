@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/celulares/:id"
+method: DELETE
+pathVariables:
+  id: "256"
+order: 4485718705620079
