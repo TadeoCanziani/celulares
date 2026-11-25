@@ -29,8 +29,8 @@ export class CelularesService {
     }
 
     // ¿Ya existe un celular con ese nombre? (case-insensitive)
-    const celularExiste = await this.celularRepository.findOneBy({
-      nombre: ILike(dto.nombre),
+    const celularExiste = await this.celularRepository.findOne({
+      where: { nombre: ILike(dto.nombre) },
     });
 
     if (celularExiste) {
